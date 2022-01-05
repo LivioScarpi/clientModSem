@@ -25,7 +25,7 @@
               <b-table striped hover :items="events"></b-table>
             </div>
             <div v-else>
-              <h5>La canzone non è stata suonata in nessun evento</h5>
+              <h5>La canzone non è stata suonata o cantata in nessun evento</h5>
             </div>
             <!--
 <h4>Strumenti con cui la canzone è stata suonata</h4>

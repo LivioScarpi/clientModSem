@@ -3,7 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="2f0a3145-1a5f-4407-93cb-850a98d928bc" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/PaginaArtisti.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/PaginaArtisti.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/Canzoni.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/Canzoni.vue" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -55,7 +55,7 @@
       <updated>1640187312026</updated>
       <workItem from="1640189859825" duration="10000" />
       <workItem from="1640190017839" duration="1049000" />
-      <workItem from="1641371229946" duration="8005000" />
+      <workItem from="1641371229946" duration="8569000" />
     </task>
     <servers />
   </component>
