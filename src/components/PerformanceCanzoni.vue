@@ -14,28 +14,25 @@
         <b-row class="text-center">
           <b-col cols="3">
             <b-list-group>
-              <b-list-group-item v-for="(elem, index) in allEvents" :key="index" @click="callQueryMethods(elem.value)"
-                                 button>{{ elem.value }}
-              </b-list-group-item>
+              <b-list-group-item v-for="(elem, index) in allEvents" :key="index" @click="callQueryMethods(elem.value)" button>{{ elem.value }}</b-list-group-item>
             </b-list-group>
           </b-col>
           <b-col cols="9">
-            <h4>Eventi in cui la canzone era in scaletta</h4>
+            <h4>Eventi in cui la performance era in scaletta</h4>
             <div v-if="events.length > 0">
-              <b-table striped hover :items="events"></b-table>
+                <b-table striped hover :items="events"></b-table>
+              </div>
+              <div v-else>
+                <h5>La performance non è stata suonata in nessun evento</h5>
+              </div>
+            <h4>Strumenti con cui la performance è stata suonata</h4>
+            <h4>NB! Se nella colonna "Strumento", se presente, non è presente nulla, vuol dire che l'artista ha cantato quella canzone</h4>
+            <div v-if="instruments.length > 0">
+              <b-table striped hover :items="instruments"></b-table>
             </div>
             <div v-else>
-              <h5>La canzone non è stata suonata in nessun evento</h5>
+              <h5>La performance non è stata suonata con degli strumenti</h5>
             </div>
-            <!--
-<h4>Strumenti con cui la canzone è stata suonata</h4>
-<div v-if="instruments.length > 0">
-  <b-table striped hover :items="instruments"></b-table>
-</div>
-<div v-else>
-  <h5>La canzone non è stata suonata con degli strumenti</h5>
-</div>
--->
           </b-col>
         </b-row>
       </b-container>
@@ -50,7 +47,7 @@ const SparqlClient = require('sparql-http-client')
 const endpointUrl = 'http://localhost:7200/repositories/MEO'
 
 export default {
-  name: "Canzoni",
+  name: "PerformanceCanzoni",
 
   components: {
     //BButton,
@@ -78,10 +75,9 @@ export default {
       PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
       PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
-      select ?titoloCanzone
+      select ?performanceCanzone
       where {
-          ?canzone rdf:type meo:Canzone;
-                  meo:titoloCanzone ?titoloCanzone.
+          ?performanceCanzone rdf:type meo:PerformanceCanzone;
       } limit 100
     `;
 
@@ -94,7 +90,7 @@ export default {
       console.log(row);
       Object.entries(row).forEach(([key, value]) => {
 
-        var artistName = value.value.replace('http://www.modsem.org/musicalEventsOntology#', '');
+        var artistName = value.value.replace('http://www.modsem.org/musicalEventsOntology#Performance', '');
 
         self.allEvents.push({value: artistName, text: artistName});
 
@@ -119,9 +115,9 @@ export default {
 
       var query = "";
 
-      //Tutti gli eventi in cui una canzone è in scaletta
-      query = `
-          PREFIX meo: <http://www.modsem.org/musicalEventsOntology#>
+      //Tutti gli eventi in cui una performance è stata suonata
+        query = `
+                    PREFIX meo: <http://www.modsem.org/musicalEventsOntology#>
           PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
           PREFIX owl: <http://www.w3.org/2002/07/owl#>
           PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -137,12 +133,7 @@ export default {
               ?scaletta rdf:type meo:Scaletta;
                         owp:hasItem ?brano.
               ?brano rdf:type meo:BranoMusicale;
-                     meo:contienePerformanceCanzone ?performanceCanzone.
-              ?performanceCanzone rdf:type meo:PerformanceCanzone;
-                       meo:performanceDiCanzone ?canzone.
-                ?canzone rdf:type meo:Canzone;
-                       meo:titoloCanzone ?titoloCanzone.
-              FILTER regex(?titoloCanzone, "` + songName + `").
+                     meo:contienePerformanceCanzone meo:Performance` + songName + `.
           } limit 100
 `;
 
@@ -166,16 +157,22 @@ export default {
         PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
         PREFIX owp: <http://www.ontologydesignpatterns.org/cp/owl/bag.owl#>
 
-        select distinct ?canzone ?strumento ?nomeArtista
+        select distinct ?nomeArtista ?strumento
         where {
-            ?canzone rdf:type meo:Canzone;
-                     meo:titoloCanzone ?titoloCanzone;
-                meo:canzoneSuonataConStrumento ?strumento.
+        {
+            meo:Performance` + songName + ` meo:performanceSuonataConStrumento ?strumento.
             ?strumento rdf:type meo:StrumentoMusicale;
                     meo:èSuonatoDa ?artista.
             ?artista meo:nomeAgenteMusicale ?nomeArtista.
-            FILTER regex(?titoloCanzone, "` + songName + `").
-        } limit 100`;
+        }
+            union
+        {
+            meo:Performance` + songName + ` meo:performanceCantataDa ?artista.
+            ?artista meo:nomeAgenteMusicale ?nomeArtista.
+            }
+        } limit 100
+
+`;
 
       //Costruisco la query
 

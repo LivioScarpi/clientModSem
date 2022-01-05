@@ -7,7 +7,7 @@
       <div>
         <b-button variant="primary" @click="findLiveEvents()">Trova eventi Live dell'artista</b-button>
       </div>-->
-      <h3>Eventi nelle città</h3>
+      <h3>StruttureMusicali</h3>
 
       <b-container class="bv-example-row">
         <b-row class="text-center">
@@ -18,17 +18,17 @@
           </b-col>
           <b-col cols="9">
 
-            <h4>informazioni sulla città: WikiData</h4>
-            <div v-if="cityInfo.length > 0">
-              <b-table striped hover :items="cityInfo"></b-table>
+            <h4>Eventi tenuti in questa struttura</h4>
+            <div v-if="events.length > 0">
+              <b-table striped hover :items="events"></b-table>
             </div>
             <div v-else>
               <h5>Non ci sono informazioni su questa città</h5>
             </div>
 
-            <h4>Eventi tenuti in questa città</h4>
-            <div v-if="groupComponents.length > 0">
-            <b-table striped hover :items="groupComponents"></b-table>
+            <h4>Informazioni su questa struttura</h4>
+            <div v-if="structureInfo.length > 0">
+            <b-table striped hover :items="structureInfo"></b-table>
             </div>
             <div v-else>
               <h5>In questa città non ci sono stati eventi</h5>
@@ -47,7 +47,7 @@ const SparqlClient = require('sparql-http-client')
 const endpointUrl = 'http://localhost:7200/repositories/MEO'
 
 export default {
-  name: "Città",
+  name: "StruttureMusicali",
 
   components: {
     //BButton,
@@ -59,8 +59,8 @@ export default {
       artistSelected: null,
       allGroups: [],
       groupsLoaded: false,
-      groupComponents: [],
-      cityInfo: [],
+      structureInfo: [],
+      events: [],
     }
   },
 
@@ -73,10 +73,10 @@ export default {
       PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
       PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
-      select distinct ?nomeCittà
+      select distinct ?nomeStruttura
       where {
-        ?città rdf:type meo:Città;
-        meo:nomeCittà ?nomeCittà.
+        ?struttura rdf:type meo:StrutturaMusicale;
+        meo:nomeStruttura ?nomeStruttura.
       } limit 100
     `;
 
@@ -106,11 +106,11 @@ export default {
 
   methods: {
     callQueryMethods(songName) {
-      this.findCityInfo(songName);
-      this.findLiveEvents(songName);
+      this.findEvents(songName);
+      this.findInfo(songName);
     },
-    async findLiveEvents(cityName) {
-      this.groupComponents = [];
+    async findInfo(structureName) {
+      this.structureInfo = [];
 
       //Costruisco la query
       const query = `
@@ -120,26 +120,24 @@ export default {
         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
         PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
-        select distinct ?nomeEvento ?nomeStruttura ?nomeCittà
+        select distinct ?nomeStruttura ?capienzaMassima ?nomeCittà
         where {
-            ?città rdf:type meo:Città;
-            meo:nomeCittà ?nomeCittà.
-            FILTER regex(?nomeCittà, "` + cityName + `").
-          ?struttura rdf:type meo:StrutturaMusicale;
+            ?struttura rdf:type meo:StrutturaMusicale;
+            meo:nomeStruttura ?nomeStruttura;
             meo:strutturaCollocataInCittà ?città;
-            meo:nomeStruttura ?nomeStruttura.
-          ?evento rdf:type meo:EventoMusicale;
-            meo:eventoInStruttura ?struttura;
-            meo:nomeEventoMusicale ?nomeEvento.
+            meo:capienzaMassimaStruttura ?capienzaMassima.
+            FILTER regex(?nomeStruttura, "` + structureName+ `").
+    		?città rdf:type meo:Città;
+             		meo:nomeCittà ?nomeCittà.
         } limit 100
     `;
 
       //Chiamo il metodo che esegue la query: situato nel component principale
-      this.groupComponents = await this.$root.$refs.HelloWorld.makeQuery(query);
+      this.structureInfo = await this.$root.$refs.HelloWorld.makeQuery(query);
     },
 
-    async findCityInfo(cityName) {
-      this.cityInfo = [];
+    async findEvents(structureName) {
+      this.events = [];
 
       //Costruisco la query
       const query = `
@@ -148,32 +146,27 @@ export default {
         PREFIX owl: <http://www.w3.org/2002/07/owl#>
         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
         PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-        PREFIX       wdt:  <http://www.wikidata.org/prop/direct/>
-        PREFIX        wd:  <http://www.wikidata.org/entity/>
-        PREFIX  wikibase:  <http://wikiba.se/ontology#>
-        PREFIX        bd:  <http://www.bigdata.com/rdf#>
 
-        select ?nomeCittà ?abbreviazione ?popolazione ?codicePostale
+        select distinct ?nomeEvento ?tipoEvento ?dataEventoMusicale ?capienzaMassimaEventoMusicale ?capienzaMassimaStruttura ?nomeCitt
         where {
-                    ?città rdf:type meo:Città;
-                     meo:nomeCittà ?nomeCittà.
-            FILTER regex(?nomeCittà, "` + cityName+ `").
-            service <https://query.wikidata.org/sparql> {
-                ?città wdt:P281 ?codicePostale;
-                       wdt:P395 ?abbreviazione;
-                       wdt:P1082 ?popolazione.
-                SERVICE wikibase:label {
-                    bd:serviceParam wikibase:language "it".
-                    ?codicePostale rdfs:label ?postalCodelabel.
-                    ?abbreviazione rdfs:label ?abbreviazionelabel.
-                    ?popolazione rdfs:label ?popolazione
-                }
-            }
-        } limit 1
+            ?struttura rdf:type meo:StrutturaMusicale;
+             meo:nomeStruttura ?nomeStruttura;
+            meo:strutturaCollocataInCittà ?città;
+            meo:capienzaMassimaStruttura ?capienzaMassimaStruttura;
+            meo:strutturaHaEvento ?evento.
+            ?città rdf:type meo:Città;
+                    meo:nomeCittà ?nomeCittà.
+            ?evento rdf:type meo:EventoMusicale;
+                    meo:nomeEventoMusicale ?nomeEvento;
+                    meo:capienzaMassimaEventoMusicale ?capienzaMassimaEventoMusicale;
+                    meo:tipoEventoMusicale ?tipoEvento;
+                    meo:dataEventoMusicale ?dataEventoMusicale.
+            FILTER regex(?nomeStruttura, "` + structureName+ `").
+        } limit 100
     `;
 
       //Chiamo il metodo che esegue la query: situato nel component principale
-      this.cityInfo = await this.$root.$refs.HelloWorld.makeQuery(query);
+      this.events = await this.$root.$refs.HelloWorld.makeQuery(query);
     },
   }
 }

@@ -95,6 +95,7 @@ export default {
   },
 
   async mounted() {
+    console.log("ESEGUO QUERY");
 
     const query = `
       PREFIX meo: <http://www.modsem.org/musicalEventsOntology#>
@@ -109,6 +110,7 @@ export default {
         meo:nomeAgenteMusicale ?nomeArtista.
       } limit 100
     `;
+    console.log(query);
 
     const client = new SparqlClient({endpointUrl})
     const stream = await client.query.select(query)
@@ -132,16 +134,21 @@ export default {
     stream.on('error', err => {
       console.error(err)
     })
+
+    console.log("ECCOmi");
   },
 
   methods: {
     callQueryMethods(songName) {
+      console.log("sono qua 1");
       this.findLiveEvents(songName);
-      this.findGenreAndLabel(songName);
-      this.findLiveEventsWD(songName);
+      //this.findGenreAndLabel(songName);
+      //this.findLiveEventsWD(songName);
     },
     async findLiveEvents(artistName) {
       this.artistsevents = [];
+
+      console.log("sono qua");
 
       //Costruisco la query
       const query = `
@@ -179,6 +186,8 @@ where {
 } limit 100
       `;
 
+      console.log(query);
+
       //Chiamo il metodo che esegue la query: situato nel component principale
       this.artistsevents = await this.$root.$refs.HelloWorld.makeQuery(query);
     },
@@ -186,8 +195,9 @@ where {
       this.genres = [];
 
       //Costruisco la query
-      const query = `
-PREFIX meo: <http://www.modsem.org/musicalEventsOntology#>
+
+      /* OLD:
+      * PREFIX meo: <http://www.modsem.org/musicalEventsOntology#>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -211,7 +221,57 @@ where {
             ?genere rdfs:label ?etichettaGenere
         }
     }
-} limit 100
+} limit 100*/
+
+      /* ALTRA VERSIONE FUNZIONANTE:
+      PREFIX meo: <http://www.modsem.org/musicalEventsOntology#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX       wdt:  <http://www.wikidata.org/prop/direct/>
+PREFIX        wd:  <http://www.wikidata.org/entity/>
+PREFIX  wikibase:  <http://wikiba.se/ontology#>
+PREFIX        bd:  <http://www.bigdata.com/rdf#>
+
+select distinct ?etichettaLabel ?genereLabel
+where {
+            ?artista rdf:type meo:AgenteMusicale;
+             meo:nomeAgenteMusicale ?nomeArtista.
+    FILTER regex(?nomeArtista, "Pinguini Tattici Nucleari").
+    service <https://query.wikidata.org/sparql> {
+        ?artista wdt:P264 ?etichetta;
+        	wdt:P136 ?genere.
+        ?etichetta rdfs:label ?etichettaLabel .
+        ?genere rdfs:label ?genereLabel .
+        FILTER (langMatches( lang(?etichettaLabel), "it" ) )
+        FILTER (langMatches( lang(?genereLabel), "it" ) )
+    }
+} limit 1
+      * */
+
+      const query = `
+PREFIX meo: <http://www.modsem.org/musicalEventsOntology#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX       wdt:  <http://www.wikidata.org/prop/direct/>
+PREFIX        wd:  <http://www.wikidata.org/entity/>
+PREFIX  wikibase:  <http://wikiba.se/ontology#>
+PREFIX        bd:  <http://www.bigdata.com/rdf#>
+
+select distinct ?genereLabel
+where {
+            ?artista rdf:type meo:AgenteMusicale;
+             meo:nomeAgenteMusicale ?nomeArtista.
+    FILTER regex(?nomeArtista, "Pinguini Tattici Nucleari").
+    service <https://query.wikidata.org/sparql> {
+        ?artista wdt:P136 ?genere.
+        ?genere rdfs:label ?genereLabel .
+        FILTER (langMatches( lang(?genereLabel), "it" ) )
+    }
+} limit 1
       `;
 
       //Chiamo il metodo che esegue la query: situato nel component principale
@@ -219,8 +279,8 @@ where {
 
       this.labels = [];
 
-      const query1 = `
-PREFIX meo: <http://www.modsem.org/musicalEventsOntology#>
+      /* OLD:
+      PREFIX meo: <http://www.modsem.org/musicalEventsOntology#>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX owl: <http://www.w3.org/2002/07/owl#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -245,6 +305,30 @@ where {
         }
     }
 } limit 100
+       */
+
+      const query1 = `
+PREFIX meo: <http://www.modsem.org/musicalEventsOntology#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX       wdt:  <http://www.wikidata.org/prop/direct/>
+PREFIX        wd:  <http://www.wikidata.org/entity/>
+PREFIX  wikibase:  <http://wikiba.se/ontology#>
+PREFIX        bd:  <http://www.bigdata.com/rdf#>
+
+select distinct ?etichettaLabel
+where {
+            ?artista rdf:type meo:AgenteMusicale;
+             meo:nomeAgenteMusicale ?nomeArtista.
+    FILTER regex(?nomeArtista, "` + artistName + `").
+    service <https://query.wikidata.org/sparql> {
+        ?artista wdt:P264 ?etichetta.
+        ?etichetta rdfs:label ?etichettaLabel .
+        FILTER (langMatches( lang(?etichettaLabel), "it" ) )
+    }
+} limit 1
       `;
 
       //Chiamo il metodo che esegue la query: situato nel component principale

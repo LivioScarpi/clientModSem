@@ -74,7 +74,7 @@ export default {
       PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
       PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
-      select ?nomeArtista
+      select distinct ?nomeArtista
       where {
         ?artista rdf:type meo:AgenteMusicale;
         meo:nomeAgenteMusicale ?nomeArtista.
@@ -125,11 +125,13 @@ where {
     ?artista rdf:type meo:AgenteMusicale;
              meo:nomeAgenteMusicale ?nomeArtista.
     FILTER regex(?nomeArtista, "` + artistName + `").
-    ?evento rdf:type meo:Concerto;
+    ?evento meo:tipoEventoMusicale ?tipoEvento;
             meo:nomeEventoMusicale ?nomeEvento;
             meo:dataEventoMusicale ?dataEvento;
             meo:eventoInStruttura ?strutturaEvento;
-            meo:capienzaMassimaEventoMusicale ?capienzaMassimaEvento.
+            meo:capienzaMassimaEventoMusicale ?capienzaMassimaEvento;
+            meo:eventoHaAgenteTramiteScaletta ?artista.
+   FILTER regex(?tipoEvento, "Concerto").
             FILTER NOT EXISTS {
     ?artista meo:agentePartecipaApertura ?evento.
     }
@@ -151,11 +153,13 @@ where {
     ?artista rdf:type meo:AgenteMusicale;
              meo:nomeAgenteMusicale ?nomeArtista.
     FILTER regex(?nomeArtista, "` + artistName + `").
-    ?evento rdf:type meo:Concerto;
+    ?evento meo:tipoEventoMusicale ?tipoEvento;
             meo:nomeEventoMusicale ?nomeEvento;
             meo:dataEventoMusicale ?dataEvento;
             meo:eventoInStruttura ?strutturaEvento;
-            meo:capienzaMassimaEventoMusicale ?capienzaMassimaEvento.
+            meo:capienzaMassimaEventoMusicale ?capienzaMassimaEvento;
+            meo:eventoHaAgenteTramiteScaletta ?artista.
+           FILTER regex(?tipoEvento, "Concerto").
 
     }
 } limit 100

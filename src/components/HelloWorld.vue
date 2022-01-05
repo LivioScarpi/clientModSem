@@ -10,21 +10,8 @@
         <b-nav-item @click="changePage(4)">Concerti</b-nav-item>
         <b-nav-item @click="changePage(5)">Scalette</b-nav-item>
         <b-nav-item @click="changePage(6)">Canzoni</b-nav-item>
-
-        <!-- Navbar dropdowns -->
-        <!--
-        <b-nav-item-dropdown text="Lang" right>
-          <b-dropdown-item href="#">EN</b-dropdown-item>
-          <b-dropdown-item href="#">ES</b-dropdown-item>
-          <b-dropdown-item href="#">RU</b-dropdown-item>
-          <b-dropdown-item href="#">FA</b-dropdown-item>
-        </b-nav-item-dropdown>
-        -->
-
-        <b-nav-item-dropdown text="User" right>
-          <b-dropdown-item href="#">Account</b-dropdown-item>
-          <b-dropdown-item href="#">Settings</b-dropdown-item>
-        </b-nav-item-dropdown>
+        <b-nav-item @click="changePage(7)">Performance Canzoni</b-nav-item>
+        <b-nav-item @click="changePage(8)">Strutture Musicali</b-nav-item>
       </b-navbar-nav>
     </b-navbar>
 
@@ -49,7 +36,12 @@
     <div v-else-if="this.page === 6">
       <Canzoni/>
     </div>
-
+    <div v-else-if="this.page === 7">
+      <PerformanceCanzoni/>
+    </div>
+    <div v-else-if="this.page === 8">
+      <StruttureMusicali/>
+    </div>
   </div>
 </template>
 
@@ -61,6 +53,8 @@ import Città from "@/components/Città";
 import Concerti from "@/components/Concerti";
 import Scalette from "@/components/Scalette";
 import Canzoni from "@/components/Canzoni";
+import PerformanceCanzoni from "@/components/PerformanceCanzoni";
+import StruttureMusicali from "./StruttureMusicali";
 
 const SparqlClient = require('sparql-http-client')
 const endpointUrl = 'http://localhost:7200/repositories/MEO'
@@ -77,7 +71,9 @@ export default {
     Città,
     Concerti,
     Scalette,
-    Canzoni
+    Canzoni,
+    PerformanceCanzoni,
+    StruttureMusicali
   },
 
   data: function () {
@@ -169,6 +165,8 @@ export default {
       queryData = new Array(Object.entries(nrow).length);
 
       stream.on('data', row => {
+        console.log(row);
+
         queryData.push({});
 
         Object.entries(row).forEach(([key, value]) => {
