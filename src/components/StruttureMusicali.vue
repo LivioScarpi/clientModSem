@@ -1,19 +1,15 @@
 <template>
   <div class="m-3">
     <div v-if="groupsLoaded">
-      <!--
-      <b-form-select v-model="artistSelected" :options="allGroups"></b-form-select>
-      <div class="mt-3">Selected: <strong>{{ artistSelected }}</strong></div>
-      <div>
-        <b-button variant="primary" @click="findLiveEvents()">Trova eventi Live dell'artista</b-button>
-      </div>-->
       <h3>StruttureMusicali</h3>
 
       <b-container class="bv-example-row">
         <b-row class="text-center">
           <b-col cols="3">
             <b-list-group>
-              <b-list-group-item v-for="(elem, index) in allGroups" :key="index" @click="callQueryMethods(elem.value)" button>{{ elem.value }}</b-list-group-item>
+              <b-list-group-item v-for="(elem, index) in allGroups" :key="index" @click="callQueryMethods(elem.value)"
+                                 button>{{ elem.value }}
+              </b-list-group-item>
             </b-list-group>
           </b-col>
           <b-col cols="9">
@@ -28,7 +24,7 @@
 
             <h4>Informazioni su questa struttura</h4>
             <div v-if="structureInfo.length > 0">
-            <b-table striped hover :items="structureInfo"></b-table>
+              <b-table striped hover :items="structureInfo"></b-table>
             </div>
             <div v-else>
               <h5>In questa città non ci sono stati eventi</h5>
@@ -66,6 +62,9 @@ export default {
 
   async mounted() {
 
+    /*
+    * Query per ottenere tutte le strutture musicali
+    */
     const query = `
       PREFIX meo: <http://www.modsem.org/musicalEventsOntology#>
       PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -112,7 +111,9 @@ export default {
     async findInfo(structureName) {
       this.structureInfo = [];
 
-      //Costruisco la query
+      /*
+      * Query per ottenere le informazioni di una struttura
+      */
       const query = `
         PREFIX meo: <http://www.modsem.org/musicalEventsOntology#>
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -126,7 +127,7 @@ export default {
             meo:nomeStruttura ?nomeStruttura;
             meo:strutturaCollocataInCittà ?città;
             meo:capienzaMassimaStruttura ?capienzaMassima.
-            FILTER regex(?nomeStruttura, "` + structureName+ `").
+            FILTER regex(?nomeStruttura, "` + structureName + `").
     		?città rdf:type meo:Città;
              		meo:nomeCittà ?nomeCittà.
         } limit 100
@@ -139,7 +140,9 @@ export default {
     async findEvents(structureName) {
       this.events = [];
 
-      //Costruisco la query
+      /*
+      * Query per ottenere tutti gli eventi tenuti in una struttura
+      */
       const query = `
         PREFIX meo: <http://www.modsem.org/musicalEventsOntology#>
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -161,7 +164,7 @@ export default {
                     meo:capienzaMassimaEventoMusicale ?capienzaMassimaEventoMusicale;
                     meo:tipoEventoMusicale ?tipoEvento;
                     meo:dataEventoMusicale ?dataEventoMusicale.
-            FILTER regex(?nomeStruttura, "` + structureName+ `").
+            FILTER regex(?nomeStruttura, "` + structureName + `").
         } limit 100
     `;
 

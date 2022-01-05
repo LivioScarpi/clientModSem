@@ -1,25 +1,20 @@
 <template>
   <div class="m-3">
     <div v-if="groupsLoaded">
-      <!--
-      <b-form-select v-model="artistSelected" :options="allGroups"></b-form-select>
-      <div class="mt-3">Selected: <strong>{{ artistSelected }}</strong></div>
-      <div>
-        <b-button variant="primary" @click="findLiveEvents()">Trova eventi Live dell'artista</b-button>
-      </div>-->
       <h3>Componenti dei gruppi</h3>
-
 
       <b-container class="bv-example-row">
         <b-row class="text-center">
           <b-col cols="3">
             <b-list-group>
-              <b-list-group-item v-for="(elem, index) in allGroups" :key="index" @click="findLiveEvents(elem.value)" button>{{ elem.value }}</b-list-group-item>
+              <b-list-group-item v-for="(elem, index) in allGroups" :key="index" @click="findLiveEvents(elem.value)"
+                                 button>{{ elem.value }}
+              </b-list-group-item>
             </b-list-group>
           </b-col>
           <b-col cols="9">
             <div v-if="groupComponents.length > 0">
-            <b-table striped hover :items="groupComponents"></b-table>
+              <b-table striped hover :items="groupComponents"></b-table>
             </div>
             <div v-else>
               <h5>Il gruppo non ha nessun componente</h5>
@@ -56,6 +51,9 @@ export default {
 
   async mounted() {
 
+    /*
+    * Query per ottenere tutti i gruppi
+    */
     const query = `
       PREFIX meo: <http://www.modsem.org/musicalEventsOntology#>
       PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -99,6 +97,12 @@ export default {
       this.groupComponents = [];
 
       //Costruisco la query
+
+      /*
+      * Query per ottenere tutti i componenti di un gruppo: Non sapendo a priori se il gruppo
+      * sia una Band o un Duo la query fa una union di due insiemi, in ognuna delle quali viene
+      * usata una relazione diversa per controllare l’appartenenza dell’agente musicale al gruppo.
+      */
       const query = `
         PREFIX meo: <http://www.modsem.org/musicalEventsOntology#>
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>

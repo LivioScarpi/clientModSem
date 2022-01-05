@@ -1,14 +1,7 @@
 <template>
   <div class="m-3">
     <div v-if="artistsLoaded">
-      <!--
-      <b-form-select v-model="eventSelected" :options="allEvents"></b-form-select>
-      <div class="mt-3">Selected: <strong>{{ eventSelected }}</strong></div>
-      <div>
-        <b-button variant="primary" @click="findLiveEvents()">Trova eventi Live dell'artista</b-button>
-      </div>-->
-      <h3>Canzoni</h3>
-
+      <h3>Performance Canzoni</h3>
 
       <b-container class="bv-example-row">
         <b-row class="text-center">
@@ -68,6 +61,9 @@ export default {
 
   async mounted() {
 
+    /*
+    * Query per ottenere ttte le performance
+    */
     const query = `
       PREFIX meo: <http://www.modsem.org/musicalEventsOntology#>
       PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -115,7 +111,9 @@ export default {
 
       var query = "";
 
-      //Tutti gli eventi in cui una performance è stata suonata
+      /*
+      * Query per ottenere tutti gli eventi in cui quella performance è stata performata
+      */
         query = `
                     PREFIX meo: <http://www.modsem.org/musicalEventsOntology#>
           PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -134,8 +132,7 @@ export default {
                         owp:hasItem ?brano.
               ?brano rdf:type meo:BranoMusicale;
                      meo:contienePerformanceCanzone meo:Performance` + songName + `.
-          } limit 100
-`;
+          } limit 100`;
 
       //Costruisco la query
 
@@ -148,7 +145,9 @@ export default {
 
       var query = "";
 
-      //Tutti gli eventi in cui una canzone è in scaletta
+      /*
+      * Query per ottenere gli artisti che hanno performato la performance e relativo strumento usato
+      */
       query = `
         PREFIX meo: <http://www.modsem.org/musicalEventsOntology#>
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -171,10 +170,7 @@ export default {
             ?artista meo:nomeAgenteMusicale ?nomeArtista.
             }
         } limit 100
-
 `;
-
-      //Costruisco la query
 
       //Chiamo il metodo che esegue la query: situato nel component principale
       this.instruments = await this.$root.$refs.HelloWorld.makeQuery(query);

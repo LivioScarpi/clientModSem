@@ -2,7 +2,6 @@
   <div>
     <b-navbar type="dark" variant="dark">
       <b-navbar-nav>
-
         <b-nav-item @click="changePage(0)">Home</b-nav-item>
         <b-nav-item @click="changePage(1)">Eventi Live Artisti</b-nav-item>
         <b-nav-item @click="changePage(2)">Gruppi</b-nav-item>
@@ -88,55 +87,6 @@ export default {
   },
 
   async mounted() {
-
-    console.log(this.page);
-
-
-    /*
-    var query = "select ?artista where { ?artista rdf:type meo:Artista } limit 100";
-
-    const myFetcher = new SparqlEndpointFetcher({
-      method: 'GET',                   // A custom HTTP method for issuing (non-update) queries, defaults to POST. Update queries are always issued via POST.
-      fetch: fetch,                     // A custom fetch-API-supporting function
-      prefixVariableQuestionMark: false // If variable names in bindings should be prefixed with '?', defaults to false
-    });
-
-    const tripleStream = await myFetcher.fetchTriples('http://localhost:7200/sparql', query);
-    tripleStream.on('data', (triple) => console.log(triple));
-
-     */
-
-    /*
-    const SparqlClient = require('sparql-http-client')
-
-    const endpointUrl = 'http://localhost:7200/repositories/MusicalEventsOntology'
-    const query = `
-      PREFIX meo: <http://www.modsem.org/musicalEventsOntology#>
-      PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-      PREFIX owl: <http://www.w3.org/2002/07/owl#>
-      PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-      PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-
-      select ?artista
-      where {
-      ?artista rdf:type meo:Artista
-      } limit 100
-    `;
-
-    const client = new SparqlClient({endpointUrl})
-    const stream = await client.query.select(query)
-
-    stream.on('data', row => {
-      Object.entries(row).forEach(([key, value]) => {
-        console.log(`${key}: ${value.value} (${value.termType})`)
-      })
-    })
-
-    stream.on('error', err => {
-      console.error(err)
-    })
-
-     */
   },
 
   methods: {
@@ -147,6 +97,11 @@ export default {
     foo: function() {
       alert('this is A.foo');
     },
+
+    /*
+    * Metodo che si occupa di contattare l'endpoint indicato da endpointUrl, di elaborare la risposta ottenuta
+    * e riorganizzarla in una struttura adatta per essere utilizzata con le b-table di bootstrap
+    */
     async makeQuery(query) {
       var queryData = [];
 
@@ -156,12 +111,12 @@ export default {
       var i = 0;
       var nrow = 0;
 
-      /*Recupero il numero di righe della nostra risposta*/
+      /* Recupero il numero di righe della nostra risposta */
       stream.on('data', () => {
         nrow++;
       })
 
-      /*Inizio l'oggetto da passare al component BTable*/
+      /* Inizializzo l'oggetto da passare al component BTable */
       queryData = new Array(Object.entries(nrow).length);
 
       stream.on('data', row => {
@@ -182,10 +137,7 @@ export default {
 
       return queryData;
     },
-
   }
-
-
 }
 </script>
 

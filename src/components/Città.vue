@@ -1,19 +1,15 @@
 <template>
   <div class="m-3">
     <div v-if="groupsLoaded">
-      <!--
-      <b-form-select v-model="artistSelected" :options="allGroups"></b-form-select>
-      <div class="mt-3">Selected: <strong>{{ artistSelected }}</strong></div>
-      <div>
-        <b-button variant="primary" @click="findLiveEvents()">Trova eventi Live dell'artista</b-button>
-      </div>-->
       <h3>Eventi nelle città</h3>
 
       <b-container class="bv-example-row">
         <b-row class="text-center">
           <b-col cols="3">
             <b-list-group>
-              <b-list-group-item v-for="(elem, index) in allGroups" :key="index" @click="callQueryMethods(elem.value)" button>{{ elem.value }}</b-list-group-item>
+              <b-list-group-item v-for="(elem, index) in allGroups" :key="index" @click="callQueryMethods(elem.value)"
+                                 button>{{ elem.value }}
+              </b-list-group-item>
             </b-list-group>
           </b-col>
           <b-col cols="9">
@@ -28,7 +24,7 @@
 
             <h4>Eventi tenuti in questa città</h4>
             <div v-if="groupComponents.length > 0">
-            <b-table striped hover :items="groupComponents"></b-table>
+              <b-table striped hover :items="groupComponents"></b-table>
             </div>
             <div v-else>
               <h5>In questa città non ci sono stati eventi</h5>
@@ -66,6 +62,9 @@ export default {
 
   async mounted() {
 
+    /*
+    * Query per ottenere tutte le città
+    */
     const query = `
       PREFIX meo: <http://www.modsem.org/musicalEventsOntology#>
       PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -113,6 +112,10 @@ export default {
       this.groupComponents = [];
 
       //Costruisco la query
+
+      /*
+      * Query per ottenere gli eventi tenuti in una città
+      */
       const query = `
         PREFIX meo: <http://www.modsem.org/musicalEventsOntology#>
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -142,6 +145,11 @@ export default {
       this.cityInfo = [];
 
       //Costruisco la query
+
+
+      /*
+      * Query per ottenere informazioni aggiuntive sulla città, contattando l'endpoint SPARQL di Wikidata
+      */
       const query = `
         PREFIX meo: <http://www.modsem.org/musicalEventsOntology#>
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -157,7 +165,7 @@ export default {
         where {
                     ?città rdf:type meo:Città;
                      meo:nomeCittà ?nomeCittà.
-            FILTER regex(?nomeCittà, "` + cityName+ `").
+            FILTER regex(?nomeCittà, "` + cityName + `").
             service <https://query.wikidata.org/sparql> {
                 ?città wdt:P281 ?codicePostale;
                        wdt:P395 ?abbreviazione;

@@ -1,14 +1,7 @@
 <template>
   <div class="m-3">
     <div v-if="artistsLoaded">
-      <!--
-      <b-form-select v-model="artistSelected" :options="allArtists"></b-form-select>
-      <div class="mt-3">Selected: <strong>{{ artistSelected }}</strong></div>
-      <div>
-        <b-button variant="primary" @click="findLiveEvents()">Trova eventi Live dell'artista</b-button>
-      </div>-->
       <h3>Eventi live degli artisti</h3>
-
 
       <b-container class="bv-example-row">
         <b-row class="text-center">
@@ -67,6 +60,9 @@ export default {
 
   async mounted() {
 
+    /*
+    * Query per ottenere tutti gli artisti
+    */
     const query = `
       PREFIX meo: <http://www.modsem.org/musicalEventsOntology#>
       PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -112,61 +108,67 @@ export default {
       var query = "";
 
       if(this.status === 'selected') {
+
+        /*
+        * Query per ottenere tutti i concerti a cui l'artista ha partecipato con il ruolo di artista principale
+        */
         query = `
-PREFIX meo: <http://www.modsem.org/musicalEventsOntology#>
-PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-PREFIX owl: <http://www.w3.org/2002/07/owl#>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+          PREFIX meo: <http://www.modsem.org/musicalEventsOntology#>
+          PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+          PREFIX owl: <http://www.w3.org/2002/07/owl#>
+          PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+          PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
-select distinct ?artista ?evento ?nomeEvento ?dataEvento ?capienzaMassimaEvento ?strutturaEvento
-where {
-    {
-    ?artista rdf:type meo:AgenteMusicale;
-             meo:nomeAgenteMusicale ?nomeArtista.
-    FILTER regex(?nomeArtista, "` + artistName + `").
-    ?evento meo:tipoEventoMusicale ?tipoEvento;
-            meo:nomeEventoMusicale ?nomeEvento;
-            meo:dataEventoMusicale ?dataEvento;
-            meo:eventoInStruttura ?strutturaEvento;
-            meo:capienzaMassimaEventoMusicale ?capienzaMassimaEvento;
-            meo:eventoHaAgenteTramiteScaletta ?artista.
-   FILTER regex(?tipoEvento, "Concerto").
-            FILTER NOT EXISTS {
-    ?artista meo:agentePartecipaApertura ?evento.
-    }
+          select distinct ?artista ?evento ?nomeEvento ?dataEvento ?capienzaMassimaEvento ?strutturaEvento
+          where {
+              {
+              ?artista rdf:type meo:AgenteMusicale;
+                       meo:nomeAgenteMusicale ?nomeArtista.
+              FILTER regex(?nomeArtista, "` + artistName + `").
+              ?evento meo:tipoEventoMusicale ?tipoEvento;
+                      meo:nomeEventoMusicale ?nomeEvento;
+                      meo:dataEventoMusicale ?dataEvento;
+                      meo:eventoInStruttura ?strutturaEvento;
+                      meo:capienzaMassimaEventoMusicale ?capienzaMassimaEvento;
+                      meo:eventoHaAgenteTramiteScaletta ?artista.
+             FILTER regex(?tipoEvento, "Concerto").
+                      FILTER NOT EXISTS {
+              ?artista meo:agentePartecipaApertura ?evento.
+              }
 
-    }
-} limit 100
+              }
+          } limit 100
       `;
       } else {
+
+        /*
+        * Query per ottenere tutti i concerti a cui l'artista ha partecipato
+        */
         query = `
-PREFIX meo: <http://www.modsem.org/musicalEventsOntology#>
-PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-PREFIX owl: <http://www.w3.org/2002/07/owl#>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+          PREFIX meo: <http://www.modsem.org/musicalEventsOntology#>
+          PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+          PREFIX owl: <http://www.w3.org/2002/07/owl#>
+          PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+          PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
-select distinct ?artista ?evento ?nomeEvento ?dataEvento ?capienzaMassimaEvento ?strutturaEvento
-where {
-    {
-    ?artista rdf:type meo:AgenteMusicale;
-             meo:nomeAgenteMusicale ?nomeArtista.
-    FILTER regex(?nomeArtista, "` + artistName + `").
-    ?evento meo:tipoEventoMusicale ?tipoEvento;
-            meo:nomeEventoMusicale ?nomeEvento;
-            meo:dataEventoMusicale ?dataEvento;
-            meo:eventoInStruttura ?strutturaEvento;
-            meo:capienzaMassimaEventoMusicale ?capienzaMassimaEvento;
-            meo:eventoHaAgenteTramiteScaletta ?artista.
-           FILTER regex(?tipoEvento, "Concerto").
+          select distinct ?artista ?evento ?nomeEvento ?dataEvento ?capienzaMassimaEvento ?strutturaEvento
+          where {
+              {
+              ?artista rdf:type meo:AgenteMusicale;
+                       meo:nomeAgenteMusicale ?nomeArtista.
+              FILTER regex(?nomeArtista, "` + artistName + `").
+              ?evento meo:tipoEventoMusicale ?tipoEvento;
+                      meo:nomeEventoMusicale ?nomeEvento;
+                      meo:dataEventoMusicale ?dataEvento;
+                      meo:eventoInStruttura ?strutturaEvento;
+                      meo:capienzaMassimaEventoMusicale ?capienzaMassimaEvento;
+                      meo:eventoHaAgenteTramiteScaletta ?artista.
+                     FILTER regex(?tipoEvento, "Concerto").
 
-    }
-} limit 100
+              }
+          } limit 100
       `;
       }
-
-      //Costruisco la query
 
       //Chiamo il metodo che esegue la query: situato nel component principale
       this.artistsevents = await this.$root.$refs.HelloWorld.makeQuery(query);
