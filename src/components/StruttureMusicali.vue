@@ -147,7 +147,7 @@ export default {
         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
         PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
-        select distinct ?nomeEvento ?tipoEvento ?dataEventoMusicale ?capienzaMassimaEventoMusicale ?capienzaMassimaStruttura ?nomeCitt
+        select distinct ?nomeEvento ?tipoEvento ?dataEventoMusicale ?capienzaMassimaEventoMusicale ?capienzaMassimaStruttura ?nomeCittà
         where {
             ?struttura rdf:type meo:StrutturaMusicale;
              meo:nomeStruttura ?nomeStruttura;
