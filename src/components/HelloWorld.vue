@@ -11,6 +11,7 @@
         <b-nav-item @click="changePage(6)">Canzoni</b-nav-item>
         <b-nav-item @click="changePage(7)">Performance Canzoni</b-nav-item>
         <b-nav-item @click="changePage(8)">Strutture Musicali</b-nav-item>
+        <b-nav-item @click="changePage(9)">Playlist</b-nav-item>
       </b-navbar-nav>
     </b-navbar>
 
@@ -121,6 +122,9 @@
     <div v-else-if="this.page === 8">
       <StruttureMusicali/>
     </div>
+    <div v-else-if="this.page === 9">
+      <Playlist/>
+    </div>
   </div>
 </template>
 
@@ -134,6 +138,7 @@ import Scalette from "@/components/Scalette";
 import Canzoni from "@/components/Canzoni";
 import PerformanceCanzoni from "@/components/PerformanceCanzoni";
 import StruttureMusicali from "./StruttureMusicali";
+import Playlist from "./Playlist";
 
 const SparqlClient = require('sparql-http-client')
 const endpointUrl = 'http://localhost:7200/repositories/MEO'
@@ -152,7 +157,8 @@ export default {
     Scalette,
     Canzoni,
     PerformanceCanzoni,
-    StruttureMusicali
+    StruttureMusicali,
+    Playlist
   },
 
   data: function () {
