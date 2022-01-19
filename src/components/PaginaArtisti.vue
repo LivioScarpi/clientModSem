@@ -134,8 +134,8 @@ export default {
   methods: {
     callQueryMethods(songName) {
       this.findLiveEvents(songName);
-      //this.findGenreAndLabel(songName);
-      //this.findLiveEventsWD(songName);
+      this.findGenreAndLabel(songName);
+      this.findLiveEventsWD(songName);
     },
     async findLiveEvents(artistName) {
       this.artistsevents = [];
@@ -262,7 +262,7 @@ export default {
           where {
                       ?artista rdf:type meo:AgenteMusicale;
                        meo:nomeAgenteMusicale ?nomeArtista.
-              FILTER regex(?nomeArtista, "Pinguini Tattici Nucleari").
+              FILTER regex(?nomeArtista, "` + artistName + `").
               service <https://query.wikidata.org/sparql> {
                   ?artista wdt:P136 ?genere.
                   ?genere rdfs:label ?genereLabel .
